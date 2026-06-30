@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're on the List — PodPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: "Plus Jakarta Sans", system-ui, sans-serif; background: #0F172A; color: #FAFAF8; min-height: 100vh; }
+    body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
+
+    .card {
+      background: #1E293B;
+      border: 1px solid #2D3F55;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #2563EB;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon svg { width: 18px; height: 18px; }
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #FAFAF8;
+      letter-spacing: -0.02em;
+    }
+
+    .icon-wrap {
+      width: 64px;
+      height: 64px;
+      background: rgba(37,99,235,0.12);
+      border: 1px solid rgba(37,99,235,0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 1.75rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      color: #FAFAF8;
+    }
+
+    .sub {
+      font-size: 0.975rem;
+      color: #93C5FD;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2D3F55;
+      margin: 1.75rem 0;
+    }
+
+    .cta-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748B;
+      margin-bottom: 1rem;
+    }
+
+    .btn-book {
+      display: block;
+      padding: 14px 24px;
+      background: #2563EB;
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      margin-bottom: 0.75rem;
+      transition: background 0.15s;
+    }
+    .btn-book:hover { background: #1d4ed8; }
+
+    .btn-home {
+      display: block;
+      padding: 13px 24px;
+      background: transparent;
+      color: #93C5FD;
+      border: 1px solid #2D3F55;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-home:hover { border-color: #93C5FD; color: #FAFAF8; }
+
+    .footer-note {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #64748B;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.25rem; }
+      h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <a href="index.html" class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <span class="logo-text">PodPilot</span>
+    </a>
+
+    <div class="icon-wrap">🎙️</div>
+
+    <h1>You're on the list.</h1>
+    <p class="sub">We'll reach out as soon as your spot is ready. PodPilot is launching soon and you'll be among the first to get access.</p>
+
+    <hr class="divider" />
+
+    <p class="cta-label">Want to skip the queue?</p>
+    <a href="https://calendar.app.google/CuLPgoBKyeuhHM6V6" target="_blank" rel="noopener" class="btn-book">
+      📅 Book a call with Daniel
+    </a>
+    <a href="index.html" class="btn-home">← Back to PodPilot</a>
+  </div>
+
+  <p class="footer-note">© 2025 PodPilot. All rights reserved.</p>
+
+</body>
+</html>

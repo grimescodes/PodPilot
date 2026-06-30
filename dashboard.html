@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PodPilot Dashboard — Builder Series</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+      --color-black:              #0F172A;
+      --color-white:              #ffffff;
+      --color-black-tint:         #64748B;
+      --color-black-tint-lighter: #94A3B8;
+      --color-canvas:             #F1F5F9;
+      --color-canvas-shade:       #E2E8F0;
+      --color-forest:             #0F172A;
+      --color-forest-tint:        #1E293B;
+      --color-purple:             #2563EB;
+      --color-warm-white:         #FAFAF8;
+      --color-soft-blue:          #93C5FD;
+      --color-emerald:            #108981;
+      --color-violet:             #8B5CF6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid; }
+    html { font-family: var(--font-sans); line-height: 1.5; background: var(--color-canvas); scrollbar-gutter: stable; }
+    body { color: var(--color-black); font-size: 1rem; min-height: 100vh; display: flex; flex-direction: column; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAVBAR ───────────────────────────── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--color-forest); border-bottom: 1px solid rgba(255,255,255,0.07);
+      height: 64px; display: flex; align-items: center; flex-shrink: 0;
+    }
+    .navbar-inner { padding: 0 2rem; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .navbar-logo { display: flex; align-items: center; gap: 0.625rem; color: #fff; font-weight: 700; font-size: 1.125rem; letter-spacing: -0.025em; }
+    .navbar-logo-icon { width: 36px; height: 36px; background: var(--color-purple); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .navbar-logo-icon svg { width: 20px; height: 20px; }
+    .navbar-nav { display: flex; align-items: center; gap: 0.125rem; }
+    .navbar-nav a { color: rgba(255,255,255,0.55); font-size: 0.875rem; padding: 0.5rem 0.875rem; border-radius: 0.375rem; transition: color 0.15s, background 0.15s; }
+    .navbar-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+    .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .show-badge { display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 0.25rem 0.75rem 0.25rem 0.5rem; font-size: 0.8125rem; color: rgba(255,255,255,0.6); }
+    .show-dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
+    .btn-nav { background: var(--color-white); color: var(--color-black); font-weight: 600; font-size: 0.875rem; border-radius: 0.375rem; padding: 0.5rem 1rem; cursor: pointer; border: none; font-family: var(--font-sans); transition: opacity 0.15s; }
+    .btn-nav:hover { opacity: 0.88; }
+
+    /* ── SHELL ────────────────────────────── */
+    .shell { display: flex; flex: 1; min-height: calc(100vh - 64px); }
+
+    /* ── SIDEBAR ──────────────────────────── */
+    .sidebar { width: 256px; flex-shrink: 0; background: var(--color-forest); border-right: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; padding: 1.5rem 0; }
+    .sidebar-show { padding: 0 1.25rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem; }
+    .sidebar-eyebrow { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 0.375rem; }
+    .sidebar-show-name { font-size: 0.9375rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; line-height: 1.3; }
+    .sidebar-show-sub { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 0.125rem; }
+    .sidebar-nav { flex: 1; padding: 0 0.625rem; display: flex; flex-direction: column; gap: 0.125rem; }
+    .snav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; border-radius: 0.5rem; color: rgba(255,255,255,0.45); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: color 0.15s, background 0.15s; }
+    .snav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); }
+    .snav-item.active { color: #fff; background: rgba(37,99,235,0.18); }
+    .snav-item.active .sn-icon { color: var(--color-soft-blue); }
+    .sn-icon { width: 17px; height: 17px; flex-shrink: 0; }
+    .sidebar-foot { margin-top: auto; padding: 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .sidebar-foot .sidebar-eyebrow { margin-bottom: 0.75rem; }
+    .sfoot-row { display: flex; justify-content: space-between; margin-bottom: 0.4375rem; }
+    .sfoot-row:last-child { margin-bottom: 0; }
+    .sfoot-key { font-size: 0.8125rem; color: rgba(255,255,255,0.38); }
+    .sfoot-val { font-size: 0.8125rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+
+    /* ── MAIN ─────────────────────────────── */
+    .main { flex: 1; overflow-y: auto; background: var(--color-canvas); display: flex; flex-direction: column; }
+    .main-header { padding: 1.5rem 2rem 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .main-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
+    .main-sub { font-size: 0.8125rem; color: var(--color-black-tint); margin-top: 0.125rem; }
+    .main-actions { display: flex; align-items: center; gap: 0.625rem; flex-shrink: 0; }
+    .btn-filter { display: flex; align-items: center; gap: 0.375rem; background: var(--color-white); color: var(--color-black-tint); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.875rem; border-radius: 0.375rem; cursor: pointer; border: 1.5px solid var(--color-canvas-shade); font-family: var(--font-sans); transition: border-color 0.15s; }
+    .btn-filter:hover { border-color: var(--color-black-tint-lighter); }
+    .btn-add { display: flex; align-items: center; gap: 0.375rem; background: var(--color-purple); color: #fff; font-size: 0.875rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; border: none; font-family: var(--font-sans); transition: opacity 0.15s; }
+    .btn-add:hover { opacity: 0.88; }
+
+    /* ── STATS ────────────────────────────── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 1.25rem 2rem; }
+    .stat-card { background: var(--color-white); border: 1.5px solid var(--color-canvas-shade); border-radius: 0.625rem; padding: 1.125rem 1.375rem; }
+    .sc-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-black-tint); margin-bottom: 0.5rem; }
+    .sc-value { font-size: 1.875rem; font-weight: 800; letter-spacing: -0.04em; color: var(--color-black); line-height: 1; margin-bottom: 0.1875rem; }
+    .sc-value.blue { color: var(--color-purple); }
+    .sc-value.green { color: #059669; }
+    .sc-desc { font-size: 0.8125rem; color: var(--color-black-tint-lighter); }
+
+    /* ── PIPELINE ─────────────────────────── */
+    .pipeline { display: grid; grid-template-columns: 292px 1fr; gap: 1rem; padding: 0 2rem 2rem; }
+
+    /* ── GUEST LIST ───────────────────────── */
+    .guest-list { display: flex; flex-direction: column; gap: 0.625rem; }
+    .gl-header { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-black-tint); margin-bottom: 0.25rem; }
+    .guest-card { background: var(--color-white); border: 1.5px solid var(--color-canvas-shade); border-radius: 0.625rem; padding: 1rem 1.125rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .guest-card:hover { border-color: var(--color-black-tint-lighter); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .guest-card.selected { border-color: var(--color-purple); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .gc-top { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.625rem; }
+    .g-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.8125rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--color-purple), var(--color-violet)); }
+    .av-femi   { background: linear-gradient(135deg, #EA580C, #FB923C); }
+    .av-green  { background: linear-gradient(135deg, #059669, #34D399); }
+    .av-amber  { background: linear-gradient(135deg, #D97706, #FCD34D); color: #7C2D12; }
+    .g-info { flex: 1; min-width: 0; }
+    .g-name { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .g-company { font-size: 0.8125rem; color: var(--color-black-tint); margin-top: 0.0625rem; }
+    .score-badge { flex-shrink: 0; font-size: 0.8125rem; font-weight: 700; padding: 0.1875rem 0.5rem; border-radius: 0.375rem; }
+    .score-badge.hi { background: rgba(5,150,105,0.1); color: #059669; }
+    .score-badge.md { background: rgba(217,119,6,0.1); color: #D97706; }
+    .gc-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .chip { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.1875rem 0.5625rem; border-radius: 100px; }
+    .chip.manual    { background: rgba(139,92,246,0.1); color: var(--color-violet); }
+    .chip.scheduled { background: rgba(37,99,235,0.1);  color: var(--color-purple); }
+    .chip.research  { background: rgba(100,116,139,0.1); color: var(--color-black-tint); }
+    .chip.new-guest { background: rgba(16,137,129,0.1); color: var(--color-emerald); }
+    .mdot { width: 3px; height: 3px; border-radius: 50%; background: var(--color-canvas-shade); flex-shrink: 0; }
+    .mmeta { font-size: 0.75rem; color: var(--color-black-tint-lighter); }
+
+    /* ── DETAIL PANEL ─────────────────────── */
+    .detail { background: var(--color-white); border: 1.5px solid var(--color-canvas-shade); border-radius: 0.75rem; overflow: hidden; display: flex; flex-direction: column; }
+    .detail.hidden { display: none; }
+
+    .detail-head { padding: 1.375rem 1.75rem; border-bottom: 1.5px solid var(--color-canvas-shade); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .dh-left { display: flex; align-items: flex-start; gap: 1rem; flex: 1; min-width: 0; }
+    .d-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.125rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--color-purple), var(--color-violet)); }
+    .d-avatar.av-femi { background: linear-gradient(135deg, #EA580C, #FB923C); }
+    .d-name { font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+    .d-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.375rem; flex-wrap: wrap; }
+    .d-company { font-size: 0.8125rem; font-weight: 600; color: var(--color-black-tint); }
+    .d-link { display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; color: var(--color-purple); font-weight: 500; }
+    .d-link:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .dh-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.125rem; flex-shrink: 0; }
+    .d-score-big { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.05em; color: #059669; line-height: 1; }
+    .d-score-label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-black-tint-lighter); }
+
+    /* TABS */
+    .tabs { display: flex; padding: 0 1.75rem; border-bottom: 1.5px solid var(--color-canvas-shade); }
+    .tab-btn { font-size: 0.875rem; font-weight: 600; color: var(--color-black-tint); padding: 0.875rem 1rem; margin-bottom: -1.5px; border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-sans); transition: color 0.15s, border-color 0.15s; }
+    .tab-btn:hover { color: var(--color-black); }
+    .tab-btn.active { color: var(--color-purple); border-bottom-color: var(--color-purple); }
+    .tab-panel { display: none; padding: 1.75rem; overflow-y: auto; }
+    .tab-panel.active { display: block; }
+
+    /* CONTENT */
+    .blk { margin-bottom: 1.75rem; }
+    .blk:last-child { margin-bottom: 0; }
+    .blk-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-black-tint); margin-bottom: 0.5rem; }
+    .blk-text { font-size: 0.9rem; color: var(--color-black); line-height: 1.7; }
+
+    .ep-block { background: var(--color-canvas); border: 1.5px solid var(--color-canvas-shade); border-radius: 0.625rem; padding: 1.125rem 1.25rem; }
+    .ep-sublabel { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-black-tint); margin-bottom: 0.3125rem; }
+    .ep-angle { font-size: 0.875rem; color: var(--color-black-tint); line-height: 1.65; margin-bottom: 0.875rem; }
+    .ep-title { font-size: 0.9375rem; font-weight: 700; color: var(--color-black); letter-spacing: -0.02em; line-height: 1.4; }
+
+    .score-row { display: grid; grid-template-columns: 1fr 80px 48px; align-items: center; gap: 1rem; padding: 0.5625rem 0; border-bottom: 1px solid var(--color-canvas-shade); }
+    .score-row:last-child { border-bottom: none; }
+    .score-row.total { padding-top: 0.75rem; margin-top: 0.25rem; border-top: 2px solid var(--color-canvas-shade); border-bottom: none; }
+    .sr-name { font-size: 0.875rem; color: var(--color-black); font-weight: 500; }
+    .score-row.total .sr-name { font-weight: 700; }
+    .sr-bar { height: 5px; background: var(--color-canvas); border-radius: 100px; overflow: hidden; }
+    .sr-fill { height: 100%; border-radius: 100px; background: var(--color-purple); }
+    .sr-fill.gr { background: #059669; }
+    .sr-fill.am { background: #D97706; }
+    .sr-frac { font-size: 0.8125rem; font-weight: 600; color: var(--color-black-tint); text-align: right; white-space: nowrap; }
+    .score-row.total .sr-frac { font-size: 1.125rem; font-weight: 800; color: #059669; letter-spacing: -0.03em; }
+
+    .rec-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--color-canvas); border: 1.5px solid var(--color-canvas-shade); border-radius: 100px; padding: 0.375rem 0.875rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-black-tint); margin-bottom: 1.25rem; }
+    .rec-badge svg { color: var(--color-purple); }
+    .ep-title-display { background: var(--color-canvas); border-left: 3px solid var(--color-purple); border-radius: 0 0.5rem 0.5rem 0; padding: 0.875rem 1.125rem; font-size: 0.9375rem; font-weight: 700; color: var(--color-black); letter-spacing: -0.02em; line-height: 1.4; margin-bottom: 1.625rem; }
+    .themes { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .theme-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0.875rem; background: var(--color-canvas); border-radius: 0.5rem; font-size: 0.875rem; color: var(--color-black); line-height: 1.6; }
+    .th-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-purple); flex-shrink: 0; margin-top: 0.375rem; }
+    .questions { list-style: none; display: flex; flex-direction: column; }
+    .q-item { display: flex; align-items: flex-start; gap: 0.875rem; padding: 0.875rem 0; border-bottom: 1px solid var(--color-canvas-shade); }
+    .q-item:last-child { border-bottom: none; }
+    .q-num { font-size: 0.75rem; font-weight: 700; color: var(--color-purple); background: rgba(37,99,235,0.08); border-radius: 0.3125rem; padding: 0.125rem 0.4375rem; flex-shrink: 0; margin-top: 0.125rem; min-width: 26px; text-align: center; }
+    .q-text { font-size: 0.9rem; color: var(--color-black); line-height: 1.65; }
+    .angles { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .angle-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; background: rgba(217,119,6,0.05); border: 1.5px solid rgba(217,119,6,0.15); border-radius: 0.625rem; }
+    .angle-icon { color: #D97706; flex-shrink: 0; margin-top: 0.0625rem; }
+    .angle-text { font-size: 0.875rem; color: var(--color-black); line-height: 1.65; }
+
+    .oa-context { display: flex; align-items: stretch; background: var(--color-canvas); border-radius: 0.5rem; margin-bottom: 1.5rem; overflow: hidden; }
+    .oa-ctx-item { padding: 0.875rem 1.125rem; display: flex; flex-direction: column; gap: 0.125rem; }
+    .oa-ctx-key { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-black-tint); }
+    .oa-ctx-val { font-size: 0.875rem; font-weight: 600; color: var(--color-black); }
+    .oa-div { width: 1px; background: var(--color-canvas-shade); flex-shrink: 0; }
+    .oa-msg-card { background: var(--color-canvas); border: 1.5px solid var(--color-canvas-shade); border-radius: 0.625rem; padding: 1.125rem 1.375rem; }
+    .oa-msg-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .oa-msg-text { font-size: 0.9rem; line-height: 1.75; color: var(--color-black); }
+    .btn-copy { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-purple); background: rgba(37,99,235,0.08); border: none; border-radius: 0.375rem; padding: 0.375rem 0.75rem; cursor: pointer; font-family: var(--font-sans); transition: background 0.15s; flex-shrink: 0; }
+    .btn-copy:hover { background: rgba(37,99,235,0.14); }
+    .btn-copy.copied { color: #059669; background: rgba(5,150,105,0.08); }
+    .oa-strategy { margin-top: 1.25rem; padding: 0.875rem 1rem; background: rgba(37,99,235,0.04); border: 1.5px solid rgba(37,99,235,0.12); border-radius: 0.625rem; }
+    .oa-strat-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-purple); margin-bottom: 0.3125rem; }
+    .oa-strat-text { font-size: 0.875rem; color: var(--color-black-tint); line-height: 1.65; }
+
+    /* ── RESPONSIVE ───────────────────────── */
+    @media (max-width: 1100px) { .pipeline { grid-template-columns: 260px 1fr; } }
+    @media (max-width: 900px)  { .pipeline { grid-template-columns: 1fr; } .detail { min-height: 480px; } }
+    @media (max-width: 768px)  { .sidebar { display: none; } .stats-row { grid-template-columns: repeat(2, 1fr); } .navbar-nav { display: none; } .main-header { flex-direction: column; align-items: flex-start; } }
+    @media (max-width: 480px)  { .stats-row { padding: 1rem; gap: 0.75rem; } .pipeline { padding: 0 1rem 1.5rem; } .main-header { padding: 1rem 1rem 0; } }
+  </style>
+</head>
+<body>
+
+<!-- BOOKING MODAL -->
+<div id="booking-modal" style="position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.8);backdrop-filter:blur(4px)">
+  <div style="background:#1E293B;border:1px solid #2D3F55;border-radius:16px;padding:40px;max-width:420px;width:90%;text-align:center">
+    <div style="font-size:2rem;margin-bottom:12px">👋</div>
+    <h2 style="color:#FAFAF8;font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:8px">Want a personal walkthrough?</h2>
+    <p style="color:#93C5FD;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.95rem;margin-bottom:28px">Book a 30-min call with Daniel to see how PodPilot can work for your show — or explore the demo on your own.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="https://calendar.app.google/CuLPgoBKyeuhHM6V6" target="_blank" rel="noopener" onclick="closeBookingModal()"
+         style="display:block;padding:14px 24px;background:#2563EB;color:#fff;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;text-decoration:none;font-size:0.95rem">
+        📅 Book a Call with Daniel
+      </a>
+      <button onclick="closeBookingModal()"
+         style="padding:14px 24px;background:transparent;border:1px solid #2D3F55;color:#93C5FD;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;font-size:0.95rem">
+        Explore the Demo →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" aria-label="PodPilot navigation">
+  <div class="navbar-inner">
+    <a href="index.html" class="navbar-logo" aria-label="PodPilot home">
+      <div class="navbar-logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      PodPilot
+    </a>
+    <nav class="navbar-nav"><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="#">Features</a></nav>
+    <div class="navbar-right">
+      <div class="show-badge"><span class="show-dot" aria-hidden="true"></span>Builder Series</div>
+      <button class="btn-nav">Add Guest</button>
+    </div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="Dashboard sidebar">
+    <div class="sidebar-show">
+      <div class="sidebar-eyebrow">Active Show</div>
+      <div class="sidebar-show-name">Builder Series</div>
+      <div class="sidebar-show-sub">Lagos · Season 2</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="snav-item active" role="button" tabindex="0">
+        <svg class="sn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Pipeline
+      </div>
+      <div class="snav-item" role="button" tabindex="0">
+        <svg class="sn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Research
+      </div>
+      <div class="snav-item" role="button" tabindex="0">
+        <svg class="sn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Interview Prep
+      </div>
+      <div class="snav-item" role="button" tabindex="0">
+        <svg class="sn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Outreach
+      </div>
+      <div class="snav-item" role="button" tabindex="0">
+        <svg class="sn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-eyebrow">This Season</div>
+      <div class="sfoot-row"><span class="sfoot-key">In pipeline</span><span class="sfoot-val">12 guests</span></div>
+      <div class="sfoot-row"><span class="sfoot-key">Avg AI score</span><span class="sfoot-val">89 / 100</span></div>
+      <div class="sfoot-row"><span class="sfoot-key">Recording this week</span><span class="sfoot-val">2</span></div>
+      <div class="sfoot-row"><span class="sfoot-key">Episodes published</span><span class="sfoot-val">24</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">Guest Pipeline</div>
+        <div class="main-sub">12 guests &middot; Season 2 &middot; Builder Series Lagos</div>
+      </div>
+      <div class="main-actions">
+        <button class="btn-filter">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>Filter
+        </button>
+        <button class="btn-add">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Guest
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="sc-label">Pipeline</div><div class="sc-value">12</div><div class="sc-desc">Guests in review</div></div>
+      <div class="stat-card"><div class="sc-label">Avg AI Score</div><div class="sc-value blue">89</div><div class="sc-desc">Out of 100</div></div>
+      <div class="stat-card"><div class="sc-label">Recording This Week</div><div class="sc-value green">2</div><div class="sc-desc">June 6 &amp; 8 &middot; In-person</div></div>
+      <div class="stat-card"><div class="sc-label">Published</div><div class="sc-value">24</div><div class="sc-desc">Episodes live</div></div>
+    </div>
+
+    <div class="pipeline">
+
+      <!-- ══ GUEST LIST ══ -->
+      <div class="guest-list" role="list">
+        <div class="gl-header">Upcoming &middot; June 2026</div>
+
+        <!-- Femi Aluko -->
+        <div class="guest-card selected" role="listitem" tabindex="0" onclick="selectGuest(this,'femi')" aria-selected="true">
+          <div class="gc-top">
+            <div class="g-avatar av-femi" aria-hidden="true">FA</div>
+            <div class="g-info">
+              <div class="g-name">Femi Aluko</div>
+              <div class="g-company">Chowdeck (YC) &middot; Food Delivery</div>
+            </div>
+            <div class="score-badge hi">92</div>
+          </div>
+          <div class="gc-meta">
+            <span class="chip new-guest">New</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">June 6</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">In-person</span>
+          </div>
+        </div>
+
+        <!-- Adebayo Sobayo -->
+        <div class="guest-card" role="listitem" tabindex="0" onclick="selectGuest(this,'adebayo')" aria-selected="false">
+          <div class="gc-top">
+            <div class="g-avatar" aria-hidden="true">AS</div>
+            <div class="g-info">
+              <div class="g-name">Adebayo Sobayo</div>
+              <div class="g-company">Rank (YC W22) &middot; Fintech</div>
+            </div>
+            <div class="score-badge hi">86</div>
+          </div>
+          <div class="gc-meta">
+            <span class="chip manual">Manual Review</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">June 8</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">In-person</span>
+          </div>
+        </div>
+
+        <!-- Amara Nwosu -->
+        <div class="guest-card" role="listitem" tabindex="0" onclick="selectGuest(this,'placeholder')" aria-selected="false">
+          <div class="gc-top">
+            <div class="g-avatar av-green" aria-hidden="true">AN</div>
+            <div class="g-info">
+              <div class="g-name">Amara Nwosu</div>
+              <div class="g-company">Shuttlers &middot; Mobility</div>
+            </div>
+            <div class="score-badge md">79</div>
+          </div>
+          <div class="gc-meta">
+            <span class="chip scheduled">Scheduled</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">June 15</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">Remote</span>
+          </div>
+        </div>
+
+        <!-- Tunde Balogun -->
+        <div class="guest-card" role="listitem" tabindex="0" onclick="selectGuest(this,'placeholder')" aria-selected="false">
+          <div class="gc-top">
+            <div class="g-avatar av-amber" aria-hidden="true">TB</div>
+            <div class="g-info">
+              <div class="g-name">Tunde Balogun</div>
+              <div class="g-company">Moniepoint &middot; Banking</div>
+            </div>
+            <div class="score-badge md">72</div>
+          </div>
+          <div class="gc-meta">
+            <span class="chip research">Research</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">June 22</span>
+            <span class="mdot" aria-hidden="true"></span>
+            <span class="mmeta">In-person</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DETAIL PANELS ══ -->
+
+      <!-- ── FEMI ALUKO (default visible) ── -->
+      <div class="detail" id="detail-femi">
+        <div class="detail-head">
+          <div class="dh-left">
+            <div class="d-avatar av-femi" aria-hidden="true">FA</div>
+            <div>
+              <div class="d-name">Femi Aluko</div>
+              <div class="d-meta">
+                <span class="d-company">Chowdeck &middot; YC</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="chip new-guest">New</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">Lagos, Nigeria</span>
+              </div>
+              <div class="d-meta" style="margin-top:0.4375rem;">
+                <a href="https://chowdeck.com" target="_blank" rel="noopener" class="d-link">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>chowdeck.com
+                </a>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">Seed · YC, Goodwater, Goat Capital</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">June 6, 2026</span>
+              </div>
+            </div>
+          </div>
+          <div class="dh-right">
+            <div class="d-score-big">92</div>
+            <div class="d-score-label">AI Score / 100</div>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('femi','overview')" id="tbtn-femi-overview" aria-controls="panel-femi-overview">Overview</button>
+          <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('femi','prep')" id="tbtn-femi-prep" aria-controls="panel-femi-prep">Interview Prep</button>
+          <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('femi','outreach')" id="tbtn-femi-outreach" aria-controls="panel-femi-outreach">Outreach</button>
+        </div>
+
+        <!-- Femi: Overview -->
+        <div class="tab-panel active" id="panel-femi-overview" role="tabpanel">
+          <div class="blk">
+            <div class="blk-label">About</div>
+            <p class="blk-text">Femi Aluko is the co-founder and CEO of Chowdeck, raised in Akesan, Alimosho LGA, Lagos State. He studied Electrical and Electronic Engineering at Obafemi Awolowo University, graduating as the best student in the Telecommunications option. Before founding Chowdeck, he was one of Paystack's earliest engineers — joining as the fifth engineer and first Core Payments Engineer in 2017 — eventually rising to Principal Engineer before departing in 2021.</p>
+            <p class="blk-text" style="margin-top:0.625rem;">Chowdeck is a Nigerian on-demand food delivery and restaurant logistics platform founded in October 2021, headquartered in Lagos. The platform connects over 1 million registered users with restaurants across 8 Nigerian cities, processing approximately ₦30 billion worth of deliveries in 2024. In June 2025, Chowdeck acquired Mira, a POS startup serving 500+ restaurants, signalling expansion into restaurant infrastructure.</p>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Why Builder Series</div>
+            <p class="blk-text">Femi is a deeply technical founder who went from architecting payment infrastructure at one of Africa's most celebrated fintechs to building what is becoming Nigeria's leading food-delivery platform — bringing an engineer's rigour to a messy, last-mile logistics problem. His trajectory from a modest upbringing in Alimosho to YC-backed founder and Future Awards Africa 2024 winner is a compelling Lagos origin story. Chowdeck is a high-visibility consumer product Lagos audiences use daily, making Femi instantly relatable to Builder Series viewers.</p>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Episode</div>
+            <div class="ep-block">
+              <div class="ep-sublabel">Angle</div>
+              <div class="ep-angle">How a Principal Engineer at Paystack applied payment-systems thinking to solve Nigeria's chaotic food-delivery market — and what it really takes to build reliable last-mile logistics at scale in Lagos.</div>
+              <div class="ep-sublabel">Proposed Title</div>
+              <div class="ep-title">"From Paystack's Engine Room to Nigeria's Dinner Table: Femi Aluko on Building Chowdeck"</div>
+            </div>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Score Breakdown</div>
+            <div role="table">
+              <div class="score-row"><span class="sr-name">Founder Story</span><div class="sr-bar"><div class="sr-fill" style="width:93%"></div></div><span class="sr-frac">14 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Product Impact</span><div class="sr-bar"><div class="sr-fill" style="width:87%"></div></div><span class="sr-frac">13 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Public Visibility</span><div class="sr-bar"><div class="sr-fill am" style="width:70%"></div></div><span class="sr-frac">7 / 10</span></div>
+              <div class="score-row"><span class="sr-name">Relevance to Africa</span><div class="sr-bar"><div class="sr-fill gr" style="width:100%"></div></div><span class="sr-frac">20 / 20</span></div>
+              <div class="score-row"><span class="sr-name">Relevance to Startups</span><div class="sr-bar"><div class="sr-fill gr" style="width:100%"></div></div><span class="sr-frac">15 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Likely Great Conversation</span><div class="sr-bar"><div class="sr-fill" style="width:87%"></div></div><span class="sr-frac">13 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Builder Mentality</span><div class="sr-bar"><div class="sr-fill gr" style="width:100%"></div></div><span class="sr-frac">10 / 10</span></div>
+              <div class="score-row total"><span class="sr-name">Total Score</span><div class="sr-bar"><div class="sr-fill gr" style="width:92%"></div></div><span class="sr-frac">92 / 100</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Femi: Interview Prep -->
+        <div class="tab-panel" id="panel-femi-prep" role="tabpanel">
+          <div class="rec-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 10l4.553-2.275A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14"/><rect x="1" y="6" width="14" height="12" rx="2"/></svg>
+            In-person &middot; Builder Series Lagos Studio
+          </div>
+          <div class="ep-title-display">From Paystack's Engine Room to Nigeria's Dinner Table: Femi Aluko on Building Chowdeck</div>
+          <div class="blk">
+            <div class="blk-label">Key Themes</div>
+            <ul class="themes">
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>Engineering rigour meets operational chaos</strong> — how a systems-thinking mindset from fintech applies to the messy, human reality of last-mile logistics in Lagos</span></li>
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>The Paystack generation</strong> — what it means to be shaped by Africa's most celebrated startup and then step out to build something entirely your own</span></li>
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>Infrastructure as strategy</strong> — why Chowdeck's acquisition of Mira signals a shift from delivery app to the operating system for Nigerian restaurants</span></li>
+            </ul>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Interview Questions</div>
+            <ol class="questions">
+              <li class="q-item"><span class="q-num">1</span><span class="q-text">You grew up in Akesan, Alimosho — not the part of Lagos that usually makes it into startup origin stories. How did that environment shape the way you think about building products for everyday Nigerians?</span></li>
+              <li class="q-item"><span class="q-num">2</span><span class="q-text">You joined Paystack as the fifth engineer and their first Core Payments Engineer in 2017 — what was it like being inside that machine in its earliest, rawest days, and what did you learn about building reliable systems under pressure that you couldn't have learned anywhere else?</span></li>
+              <li class="q-item"><span class="q-num">3</span><span class="q-text">There's a massive leap between architecting payment rails at Paystack and deciding to launch a food delivery company. Walk us through the exact moment — or series of moments — that made you say, 'This is the problem I'm leaving to go solve.'</span></li>
+              <li class="q-item"><span class="q-num">4</span><span class="q-text">Food delivery in Lagos is notoriously brutal — traffic, unreliable riders, restaurants that aren't operationally ready for delivery volume. When you first put an order through Chowdeck's system in 2021, what broke first, and how did that shape your early product decisions?</span></li>
+              <li class="q-item"><span class="q-num">5</span><span class="q-text">You came in as a deeply technical founder. At what point did you realise that the hardest problems at Chowdeck weren't engineering problems — and how did you have to rewire yourself as a leader to handle that?</span></li>
+              <li class="q-item"><span class="q-num">6</span><span class="q-text">Processing roughly ₦30 billion in deliveries in 2024 is a serious number. But what's the metric you watch that most people outside Chowdeck don't know about — the one that tells you whether the business is actually healthy or quietly struggling?</span></li>
+              <li class="q-item"><span class="q-num">7</span><span class="q-text">In June 2025, Chowdeck acquired Mira, a POS startup serving over 500 restaurants. That's a significant strategic move — you're now touching restaurant infrastructure, not just delivery. What's the real bet you're making there, and what does Chowdeck look like in five years if that bet pays off?</span></li>
+              <li class="q-item"><span class="q-num">8</span><span class="q-text">Tell me about a decision you made at Chowdeck that felt right at the time, didn't work, and genuinely cost you — whether that's money, time, or team trust.</span></li>
+              <li class="q-item"><span class="q-num">9</span><span class="q-text">You went through Y Combinator. A lot of Nigerian founders debate whether YC is worth the equity and the California framing of startup success. What's your honest take — what did YC actually give you, and what did it miss about building in Lagos?</span></li>
+              <li class="q-item"><span class="q-num">10</span><span class="q-text">You're a YC-backed founder, a Future Awards winner, the face of one of Nigeria's most visible consumer apps — but you're also still relatively early in the journey. What do you think you still don't know that will matter most in the next three years?</span></li>
+            </ol>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Controversial / Unique Angles</div>
+            <ul class="angles">
+              <li class="angle-item">
+                <svg class="angle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span class="angle-text">Chowdeck operates in a market where Jumia Food shut down and global giants have repeatedly failed — the bold question is whether any food delivery business in Nigeria can ever be sustainably profitable, or whether Chowdeck is essentially racing to become infrastructure before the unit economics catch up with them.</span>
+              </li>
+              <li class="angle-item">
+                <svg class="angle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span class="angle-text">Femi left Paystack as a Principal Engineer to build in food delivery — a sector many engineers would consider 'beneath' their technical ambitions. There's a provocative conversation about whether the Lagos tech ecosystem overvalues fintech and undervalues the harder, dirtier problem of physical logistics.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Femi: Outreach -->
+        <div class="tab-panel" id="panel-femi-outreach" role="tabpanel">
+          <div class="oa-context">
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Format</span><span class="oa-ctx-val">In-Person</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Location</span><span class="oa-ctx-val">Builder Series Lagos Studio</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Week</span><span class="oa-ctx-val">June 6, 2026</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Status</span><span class="oa-ctx-val">Ready to Send</span></div>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Outreach Message</div>
+            <div class="oa-msg-card">
+              <div class="oa-msg-top">
+                <span class="blk-label" style="margin-bottom:0;">AI-Generated Draft</span>
+                <button class="btn-copy" id="copy-femi" onclick="copyMsg('femi-msg','copy-femi')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy
+                </button>
+              </div>
+              <p class="oa-msg-text" id="femi-msg">Femi, we've been following Chowdeck closely — and what stands out to us isn't just the growth, it's the fact that you took the discipline of building payment infrastructure at Paystack and applied it to one of Lagos's most chaotic, human problems. We'd love to have you on Builder Series to tell that full story — from Akesan to YC to ₦30 billion in deliveries — in a way that gives our audience of Lagos founders and engineers something they can actually build with.</p>
+            </div>
+          </div>
+          <div class="oa-strategy">
+            <div class="oa-strat-label">Strategy Note</div>
+            <div class="oa-strat-text">Reach out by acknowledging Chowdeck's recent Mira acquisition as a timely hook — position the episode as a chance to tell the full builder story behind one of Lagos's most-used consumer apps, from his early days as Paystack's first payments engineer to scaling a logistics platform to 8 cities and ₦30B in deliveries.</div>
+          </div>
+        </div>
+      </div><!-- /detail-femi -->
+
+      <!-- ── ADEBAYO SOBAYO (hidden by default) ── -->
+      <div class="detail hidden" id="detail-adebayo">
+        <div class="detail-head">
+          <div class="dh-left">
+            <div class="d-avatar" aria-hidden="true">AS</div>
+            <div>
+              <div class="d-name">Adebayo Sobayo</div>
+              <div class="d-meta">
+                <span class="d-company">Rank &middot; YC W22</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="chip manual">Manual Review</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">Lagos, Nigeria</span>
+              </div>
+              <div class="d-meta" style="margin-top:0.4375rem;">
+                <a href="https://www.rank.africa" target="_blank" rel="noopener" class="d-link">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>rank.africa
+                </a>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">Team: ~20</span>
+                <span class="mdot" aria-hidden="true"></span>
+                <span class="mmeta">June 8, 2026</span>
+              </div>
+            </div>
+          </div>
+          <div class="dh-right">
+            <div class="d-score-big">86</div>
+            <div class="d-score-label">AI Score / 100</div>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('adebayo','overview')" id="tbtn-adebayo-overview" aria-controls="panel-adebayo-overview">Overview</button>
+          <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('adebayo','prep')" id="tbtn-adebayo-prep" aria-controls="panel-adebayo-prep">Interview Prep</button>
+          <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('adebayo','outreach')" id="tbtn-adebayo-outreach" aria-controls="panel-adebayo-outreach">Outreach</button>
+        </div>
+
+        <!-- Adebayo: Overview -->
+        <div class="tab-panel active" id="panel-adebayo-overview" role="tabpanel">
+          <div class="blk">
+            <div class="blk-label">About</div>
+            <p class="blk-text">Rank (formerly Moni Africa) is a Lagos-based fintech startup that provides group financing and working capital loans to small businesses and mobile money agents across Africa. The company leverages social trust and collective group responsibility as collateral, replacing traditional credit scoring. With a reported ~99% repayment rate, Rank targets Africa's 44+ million underserved SMBs.</p>
+            <p class="blk-text" style="margin-top:0.625rem;">Adedapo ('Dapo') Sobayo is co-founder and CTO of Rank, a YC W22-backed fintech. He has a background in blockchain development and co-founded Moni in 2021 alongside Femi Iromini, going through Y Combinator's Winter 2022 batch.</p>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Why Builder Series</div>
+            <p class="blk-text">Dapo is building a fintech solution that turns social trust into a financial product — cracking the SMB credit problem in Africa without traditional collateral. The ~99% repayment rate challenges conventional fintech assumptions. As a YC-backed CTO co-founder serving Africa's 44 million+ small businesses, he represents exactly the technical, mission-driven Lagos founder the Builder Series audience wants to hear from.</p>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Episode</div>
+            <div class="ep-block">
+              <div class="ep-sublabel">Angle</div>
+              <div class="ep-angle">How Dapo and the Rank team replaced traditional credit scoring with social trust — and what building a fintech for Africa's informal economy really looks like from the engineering and product side.</div>
+              <div class="ep-sublabel">Proposed Title</div>
+              <div class="ep-title">"The Trust Stack: How Rank Is Turning Social Capital Into Small Business Credit Across Africa"</div>
+            </div>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Score Breakdown</div>
+            <div role="table">
+              <div class="score-row"><span class="sr-name">Founder Story</span><div class="sr-bar"><div class="sr-fill" style="width:80%"></div></div><span class="sr-frac">12 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Product Impact</span><div class="sr-bar"><div class="sr-fill" style="width:87%"></div></div><span class="sr-frac">13 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Public Visibility</span><div class="sr-bar"><div class="sr-fill am" style="width:60%"></div></div><span class="sr-frac">6 / 10</span></div>
+              <div class="score-row"><span class="sr-name">Relevance to Africa</span><div class="sr-bar"><div class="sr-fill gr" style="width:100%"></div></div><span class="sr-frac">20 / 20</span></div>
+              <div class="score-row"><span class="sr-name">Relevance to Startups</span><div class="sr-bar"><div class="sr-fill" style="width:93%"></div></div><span class="sr-frac">14 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Likely Great Conversation</span><div class="sr-bar"><div class="sr-fill" style="width:80%"></div></div><span class="sr-frac">12 / 15</span></div>
+              <div class="score-row"><span class="sr-name">Builder Mentality</span><div class="sr-bar"><div class="sr-fill gr" style="width:90%"></div></div><span class="sr-frac">9 / 10</span></div>
+              <div class="score-row total"><span class="sr-name">Total Score</span><div class="sr-bar"><div class="sr-fill gr" style="width:86%"></div></div><span class="sr-frac">86 / 100</span></div>
+            </div>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Other Ventures</div>
+            <p class="blk-text"><strong>Metrifox</strong> — A startup founded by Adebayo Sobayo. No public product description or launch details available; appears to be in early or stealth stage with no indexed web presence as of 2024–2025.</p>
+          </div>
+        </div>
+
+        <!-- Adebayo: Interview Prep -->
+        <div class="tab-panel" id="panel-adebayo-prep" role="tabpanel">
+          <div class="rec-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 10l4.553-2.275A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14"/><rect x="1" y="6" width="14" height="12" rx="2"/></svg>
+            In-person &middot; Builder Series Lagos Studio
+          </div>
+          <div class="ep-title-display">From Social Trust to $0 Collateral: How Dapo Sobayo Is Rebuilding Credit for Africa's 44 Million Small Businesses</div>
+          <div class="blk">
+            <div class="blk-label">Key Themes</div>
+            <ul class="themes">
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>Social trust as infrastructure</strong> — how informal human networks can replace formal financial systems as a foundation for credit and financial access</span></li>
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>The discipline of building for context</strong> — what it really means to engineer products for Africa's SMB reality, from connectivity constraints to agent behaviour to regulatory friction</span></li>
+              <li class="theme-item"><span class="th-dot" aria-hidden="true"></span><span><strong>The CTO as co-founder</strong> — navigating the tension between technical vision, product instincts, and business pressures when you're both an architect and a decision-maker</span></li>
+            </ul>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Interview Questions</div>
+            <ol class="questions">
+              <li class="q-item"><span class="q-num">1</span><span class="q-text">Take us back to 2021 — you had a blockchain background, the NFT and DeFi wave was at its peak, and you chose to build group lending for market traders in Lagos. What did you see that made you walk away from the hype and go grassroots?</span></li>
+              <li class="q-item"><span class="q-num">2</span><span class="q-text">The name change from Moni Africa to Rank feels intentional — what shift in thinking or positioning does that rebrand actually represent, and what does 'Rank' mean to you as a builder?</span></li>
+              <li class="q-item"><span class="q-num">3</span><span class="q-text">Walk us through how the group lending model actually works technically — how do you engineer social trust into a product without it becoming a glorified spreadsheet with a fintech logo on it?</span></li>
+              <li class="q-item"><span class="q-num">4</span><span class="q-text">A 99% repayment rate is the kind of stat that makes investors lean forward — but what does the 1% teach you? What breaks down, and how does that inform how you build?</span></li>
+              <li class="q-item"><span class="q-num">5</span><span class="q-text">You went through YC W22 as a Lagos-based CTO co-founder — most YC advice is shaped by a Silicon Valley mental model. Where did that advice fit, and where did you have to throw it out entirely to build for Nigeria's informal economy?</span></li>
+              <li class="q-item"><span class="q-num">6</span><span class="q-text">Your co-founder Femi handles the business side — as the technical co-founder, how do you decide what to build versus buy, especially when you're serving agents and SMB owners who may have very different device and connectivity realities?</span></li>
+              <li class="q-item"><span class="q-num">7</span><span class="q-text">Africa has 44 million underserved SMBs — that's a massive, exciting number, but it's also a trap if you're not disciplined about sequencing. How are you thinking about which segment to go deep on before going wide?</span></li>
+              <li class="q-item"><span class="q-num">8</span><span class="q-text">Tell us about Metrifox — what problem are you going after there, and why was this something you needed to build separately rather than fold into Rank?</span></li>
+              <li class="q-item"><span class="q-num">9</span><span class="q-text">Building Rank taught you something about trust, data, and informal networks that most fintech founders never get close to — how is that shaping the way you're thinking about and building Metrifox?</span></li>
+              <li class="q-item"><span class="q-num">10</span><span class="q-text">If you could go back and give your 2021 self one piece of advice about building fintech infrastructure for Africa's informal economy — not a motivational line, but a hard, specific truth — what would it be?</span></li>
+            </ol>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Controversial / Unique Angles</div>
+            <ul class="angles">
+              <li class="angle-item">
+                <svg class="angle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span class="angle-text">Group lending has a complicated global history — microfinance in Bangladesh and Kenya produced real harm through social coercion and debt spirals. Is Rank's model genuinely different, or does the ~99% repayment rate paper over the same uncomfortable social pressure dynamic?</span>
+              </li>
+              <li class="angle-item">
+                <svg class="angle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span class="angle-text">Dapo has a blockchain background but built a product that — at its core — runs on spreadsheet-level trust logic. Is blockchain in African fintech actually a solution looking for a problem, or is there a version of Rank's infrastructure that eventually needs to be on-chain to scale?</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Adebayo: Outreach -->
+        <div class="tab-panel" id="panel-adebayo-outreach" role="tabpanel">
+          <div class="oa-context">
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Format</span><span class="oa-ctx-val">In-Person</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Location</span><span class="oa-ctx-val">Builder Series Lagos Studio</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Week</span><span class="oa-ctx-val">June 8, 2026</span></div>
+            <div class="oa-div"></div>
+            <div class="oa-ctx-item"><span class="oa-ctx-key">Status</span><span class="oa-ctx-val">Ready to Send</span></div>
+          </div>
+          <div class="blk">
+            <div class="blk-label">Outreach Message</div>
+            <div class="oa-msg-card">
+              <div class="oa-msg-top">
+                <span class="blk-label" style="margin-bottom:0;">AI-Generated Draft</span>
+                <button class="btn-copy" id="copy-adebayo" onclick="copyMsg('adebayo-msg','copy-adebayo')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy
+                </button>
+              </div>
+              <p class="oa-msg-text" id="adebayo-msg">Dapo, what you and Femi have built at Rank — engineering social trust into a lending product with a reported 99% repayment rate, without a single piece of traditional collateral — is exactly the kind of counterintuitive, Lagos-forged thinking our Builder Series audience needs to hear unpacked. We'd love to have you in the studio for an honest conversation about what building fintech for Africa's informal economy really looks like from the inside, including the hard decisions, the YC reality check, and where Rank goes next.</p>
+            </div>
+          </div>
+          <div class="oa-strategy">
+            <div class="oa-strat-label">Strategy Note</div>
+            <div class="oa-strat-text">Reach out highlighting Builder Series' focus on technical founders solving uniquely African problems — position the episode as a chance to tell the full story behind the pivot from Moni to Rank and what the group lending model has taught him about building fintech infrastructure for the informal economy.</div>
+          </div>
+        </div>
+      </div><!-- /detail-adebayo -->
+
+    </div><!-- /pipeline -->
+  </main>
+</div><!-- /shell -->
+
+<script>
+  function selectGuest(card, guestId) {
+    document.querySelectorAll('.guest-card').forEach(c => {
+      c.classList.remove('selected');
+      c.setAttribute('aria-selected', 'false');
+    });
+    card.classList.add('selected');
+    card.setAttribute('aria-selected', 'true');
+
+    document.querySelectorAll('.detail').forEach(d => d.classList.add('hidden'));
+    const panel = document.getElementById('detail-' + guestId);
+    if (panel) panel.classList.remove('hidden');
+  }
+
+  function switchTab(guestId, tabName) {
+    const prefix = guestId + '-';
+    document.querySelectorAll('[id^="tbtn-' + prefix + '"]').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('[id^="panel-' + prefix + '"]').forEach(p => p.classList.remove('active'));
+    const btn   = document.getElementById('tbtn-'   + prefix + tabName);
+    const panel = document.getElementById('panel-'  + prefix + tabName);
+    if (btn)   { btn.classList.add('active');   btn.setAttribute('aria-selected', 'true'); }
+    if (panel) panel.classList.add('active');
+  }
+
+  function copyMsg(msgId, btnId) {
+    const text = document.getElementById(msgId).textContent.trim();
+    const btn  = document.getElementById(btnId);
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Copied!`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
+      }, 2000);
+    });
+  }
+</script>
+
+<script>
+  function closeBookingModal() {
+    document.getElementById('booking-modal').style.display = 'none';
+  }
+  document.getElementById('booking-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
+  });
+</script>
+</body>
+</html>

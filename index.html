@@ -820,10 +820,14 @@
       /* HERO */
       .hero-content { padding: 0 1rem 2.5rem; }
       .hero-mosaic {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         grid-auto-rows: 72px;
         gap: 5px;
         padding: 0 5px;
+      }
+      .hero-mosaic .mt {
+        grid-column: auto !important;
+        grid-row: auto !important;
       }
 
       /* SECTION PADDINGS */
@@ -888,6 +892,10 @@
         gap: 4px;
         padding: 0 4px;
       }
+      .hero-mosaic .mt {
+        grid-column: auto !important;
+        grid-row: auto !important;
+      }
 
       /* HERO ACTIONS — stack buttons */
       .hero-actions { flex-direction: column; align-items: center; gap: 0.625rem; }
@@ -914,7 +922,7 @@
 
   <!-- BANNER -->
   <div class="banner">
-    New: AI-powered guest research is here. <a href="#">See how PodPilot works →</a>
+    New: AI-powered guest research is here. <a href="dashboard.html">See how PodPilot works →</a>
   </div>
 
   <!-- NAVBAR -->
@@ -935,7 +943,7 @@
         <a href="#">Use Cases</a>
         <a href="#">Customers</a>
         <a href="#">Company</a>
-        <a href="#" class="navbar-cta">Request a Demo</a>
+        <a href="dashboard.html" class="navbar-cta">Request a Demo</a>
       </div>
     </div>
   </nav>
@@ -950,8 +958,8 @@
       <h1 class="hero-h1">Every great conversation starts before you hit record</h1>
       <p class="hero-sub">AI-powered research. Smarter outreach. Better episodes. We help you prepare for conversations people will remember.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-white">Request a Demo</a>
-        <a href="#" class="btn-ghost-hero">Explore platform →</a>
+        <a href="dashboard.html" class="btn-white">Request a Demo</a>
+        <a href="dashboard.html" class="btn-ghost-hero">Explore platform →</a>
       </div>
     </div>
 
@@ -1269,7 +1277,7 @@
   <section class="section-cta">
     <div class="section-cta-inner">
       <h2 class="cta-headline">Start your transformation journey</h2>
-      <a href="#" class="btn-white" style="flex-shrink:0;white-space:nowrap">Request a Demo</a>
+      <a href="dashboard.html" class="btn-white" style="flex-shrink:0;white-space:nowrap">Request a Demo</a>
     </div>
   </section>
 
@@ -1296,7 +1304,7 @@
               <li><a href="#">Platform</a></li>
               <li><a href="pricing.html">Pricing</a></li>
               <li><a href="#">Case Studies</a></li>
-              <li><a href="#">Request a Demo</a></li>
+              <li><a href="dashboard.html">Request a Demo</a></li>
               <li><a href="#">Blog</a></li>
             </ul>
           </div>
